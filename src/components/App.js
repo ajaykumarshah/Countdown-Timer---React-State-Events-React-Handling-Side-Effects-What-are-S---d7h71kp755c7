@@ -2,83 +2,42 @@ import React, { Component, useState, useEffect } from "react";
 import '../styles/App.css';
 
 const App = () => {
-
-  const [time, setTime] = useState("");
-  const [updatedtime, setUpdatedtime] = useState();
-  const [status, setStatus] = useState(false);
-
-  const handlechange = (event) => {
-
-    if (event.key === 'Enter') {
-
-      setStatus(true);
-
-      setUpdatedtime(() => {
-        let t = Number(time)
-        t = Math.floor(t);
-        return t;
-      }
-
-      );
-
-      let a = event.target.value;
-      if (isNaN(a)) {
-        setUpdatedtime(0);
-      }
-
-      if (status) {
-        let a = event.target.value;
-        if (isNaN(a)) {
-          setUpdatedtime(0);
-          return;
-        }
-        setUpdatedtime(() => {
-          let t = Number(time)
-          t = Math.floor(t);
-          return t;
-        });
-        setStatus(true);
-      }
-      return;
-    }
-
-
-
-    let t = event.target.value;
-    t = Number(t);
-    setTime(t);
-
-
-  }
+  let timerId = ""
+  let [timeLeft, setTimeLeft] = useState(0);
 
 
   useEffect(() => {
+    if (timeLeft > 0) {
+      timerId = setTimeout(() => {
+        setTimeLeft(timeLeft - 1)
+      }, 1000);
+    }
+  }, [timeLeft])
 
-    let id = setInterval(() => {
-      if (updatedtime == 0) {
-        setStatus(false);
+
+  const countInReverse = (e) => {
+    if (e.keyCode === 13) {
+      clearTimeout(timerId)
+      let timeCountValue = document.getElementById('timeCount').value;
+      if (!isNaN(timeCountValue)) {
+        setTimeLeft(parseInt(timeCountValue));
+      } else {
+        if (timerId !== "") {
+          clearTimeout(timerId)
+        }
+        setTimeLeft(0)
       }
-      if (status && updatedtime > 0) {
-        setUpdatedtime(updatedtime - 1);
-      }
-    }, 1000);
-
-    return (() => {
-      clearInterval(id);
-    })
-
-  }, [updatedtime])
-
-
+    }
+  }
 
   return (
-    <div className="wrapper">
+    <div className="main">
       <div id="whole-center">
         <h1>
-          Reverse countdown for<input id="timeCount" onKeyUp={handlechange} /> sec.
+          Reverse countdown for<input id="timeCount" onKeyDown={countInReverse} /> sec.
         </h1>
       </div>
-      <div id="current-time">{updatedtime}</div>
+      <div id="current-time">{timeLeft}</div>
     </div>
   )
 }
